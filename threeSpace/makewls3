@@ -1,0 +1,1 @@
+cc wls3.c matutil.c nrutil.c ludcmp.c lubksb.c -o wls3 -lm

@@ -1,0 +1,1 @@
+cc repeater.c -o repeater -lm
