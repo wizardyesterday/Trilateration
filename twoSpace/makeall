@@ -1,0 +1,3 @@
+sh makewls
+sh makerepeater
+sh makegendata
