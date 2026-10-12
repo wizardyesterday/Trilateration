@@ -189,9 +189,13 @@ void matMultiply(int m,int n,int p,double **a,double **b,double **c)
   
   Inputs:
 
-      n - The number of rows and columns in matrix a.
+      n - The number of rows and the number of columns in matrix a.
       
-      a - A linear array that stores values in column major order.
+      a - A pointer to a pointer of an array of values.
+
+      aInv - A pointer to a pointer to storage for the inverse of a.
+
+      buffer - A pointer to a buffer to be used for temporary storage.
       
   Outputs:
   

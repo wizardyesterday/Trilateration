@@ -5,6 +5,10 @@
 #ifndef __MATUTIL_H__
 #define __MATUTIL_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*************************************************************************
  defines    
 *************************************************************************/
@@ -23,5 +27,9 @@ void vecDotProduct(int n,double *v1,double *v2,double *v1DotV2);
 void matAdd(int m,int n,double **a,double **b,double **c);
 void matMultiply(int m,int n,int p,double **a,double **b,double **c);
 int matInverse(int n,double **a,double **aInv,double *buffer);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MATUTIL_H__ */
