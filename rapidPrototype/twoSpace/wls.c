@@ -475,8 +475,11 @@ void wlsComputeDirection(double xn,double xi,double x0,
 int wlsComputeDeltaXy(int m,double **c,double **dR,double **dXy)
 {
   int status;
-  int i, j, position;
   double buffer[4];
+  double *aPtr, *bPtr;
+
+  aPtr = &cTxcm[0][0];
+  bPtr = &cTxcInvm[0][0];
 
   /* compute [C'] */
   matTranspose(m,2,c,cT);
@@ -484,29 +487,11 @@ int wlsComputeDeltaXy(int m,double **c,double **dR,double **dXy)
   /* compute cTxc = [C'][C] */
   matMultiply(2,m,2,cT,c,cTxc);
   
-  position = 0;
-  for (i = 0; i < 2; i++)
-  {
-    for (j = 0; j < 2; j++)
-    {
-      buffer[position] = cTxc[j][i];
-    } // for
-  } // for
-
   /* compute cInv = Inv([C'][C]) */
-  status = matInverse(2,buffer);
+  status = matInverse(2,&aPtr,&bPtr,buffer);
   
   if (status == 1)
   {
-    // Copy linear buffer to inverse matrix storage.
-    for (i = 0; i < 2; i++)
-    {
-      for (j = 0; j < 2; j++)
-      {
-        cTxcInv[i][j] = buffer[i + (2 * j)];
-      } // for
-    } // for
-
     /* compute cTxdR = [C'][dR] */
     matMultiply(2,m,1,cT,dR,cTxdR);
   

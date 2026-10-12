@@ -200,31 +200,52 @@ void matMultiply(int m,int n,int p,double **a,double **b,double **c)
         1 - Success.
   
 *************************************************************************/
-int matInverse(int n,double *a)
+int matInverse(int n,double **a,double **aInv,double *buffer)
 {
   int status;
-  int lda;
-  int ipriv[100];
+  int i, j, position;
+  int lda;  
+  int ipriv[100]; 
   double work[100];
   int lwork = 100;
-  double *aPtr;
-
-  // We need this to make LAPACK happy.
-  aPtr = (double *)a;
-
+    
   // This is a square matrix.
   lda = n; 
+    
+  // Copy the matrix into the linear buffer.
+  position  = 0;
+  for (i = 0; i < n; i++)
+  {
+    for (j = 0; j < n; j++)
+    {
+      buffer[position] = a[0][i + (n * j)];
+      position++;
+    } // for
+  } // for
 
-  // Perform factorization. 
-  dgetrf_(&n,&n,a,&lda,&ipriv,&status);
+  // Perform factorization.
+  dgetrf_(&n,&n,buffer,&lda,&ipriv,&status);
 
   if (status == 0)
   {
     // Invert.
-    dgetri_(&n,a,&lda,&ipriv,&work,&lwork,&status);
+    dgetri_(&n,buffer,&lda,&ipriv,&work,&lwork,&status);
+
+    if (status == 0)
+    {
+      // Copy the linear buffer into the output matrix.
+      position  = 0;
+      for (i = 0; i < n; i++)
+      {
+        for (j = 0; j < n; j++)
+        {
+          aInv[0][i + (n * j)] = buffer[position];
+          position++;
+        } // for
+      } // for
+    } // if
   } // if
 
-  // Keep the original code happy.
   if (status == 0)
   {
     status = 1;
@@ -233,6 +254,7 @@ int matInverse(int n,double *a)
   {
     status = 0;
   } // else
+
   return (status);
 
 } /* matInverse */

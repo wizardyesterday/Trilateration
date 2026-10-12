@@ -22,6 +22,6 @@ void matTranspose(int m,int n,double **a,double **aT);
 void vecDotProduct(int n,double *v1,double *v2,double *v1DotV2);
 void matAdd(int m,int n,double **a,double **b,double **c);
 void matMultiply(int m,int n,int p,double **a,double **b,double **c);
-int matInverse(int n,double *a);
+int matInverse(int n,double **a,double **aInv,double *buffer);
 
 #endif /* __MATUTIL_H__ */
