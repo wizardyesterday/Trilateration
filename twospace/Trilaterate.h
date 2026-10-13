@@ -2,15 +2,15 @@
  file name: Trilaterate.h     
 *************************************************************************/
 
-#ifndef __WLS_H__
-#define __WLS_H__
+#ifndef __TRI_H__
+#define __TRI_H__
 
 /*************************************************************************
  defines    
 *************************************************************************/
-#define WLS_MAX_RECEIVERS   (50)
-#define WLS_LAMDA_TOLERANCE (0.1)
-#define WLS_MAX_ITERATIONS  (100)
+#define TRI_MAX_RECEIVERS   (50)
+#define TRI_LAMDA_TOLERANCE (0.1)
+#define TRI_MAX_ITERATIONS  (100)
 
 #define TDOA_FT_PER_NS      (0.98357105643L)
 #define TDOA_M_PER_NS       (0.299792458L)
@@ -28,18 +28,18 @@ struct vector3
 /*************************************************************************
  function prototypes     
 *************************************************************************/
-void wlsInit(void);
+void triInit(void);
 
-int wlsComputePosition(int m,double xn,double yn,struct vector3 *v,
+int triComputePosition(int m,double xn,double yn,struct vector3 *v,
                        double *x,double *y);
 
-double wlsComputeNomRange(double xn,double xi,double x0,
+double triComputeNomRange(double xn,double xi,double x0,
                           double yn,double yi,double y0);
 			 
-void wlsComputeDirection(double xn,double xi,double x0,
+void triComputeDirection(double xn,double xi,double x0,
                          double yn,double yi,double y0,
 			 double *cx,double *cy);
 			 
-int wlsComputeDeltaXy(int m,double **c,double **dR,double **dXy);
+int triComputeDeltaXy(int m,double **c,double **dR,double **dXy);
 
-#endif /* __WLS_H__ */
+#endif /* __TRI_H__ */

@@ -5,27 +5,27 @@
 
 int spaceIsInFeet;
 
-double dXym[3][2], dRm[WLS_MAX_RECEIVERS][2];
-double *dXy[3], *dR[WLS_MAX_RECEIVERS];
+double dXym[3][2], dRm[TRI_MAX_RECEIVERS][2];
+double *dXy[3], *dR[TRI_MAX_RECEIVERS];
 
-double cm[WLS_MAX_RECEIVERS][3];
-double *c[WLS_MAX_RECEIVERS];
+double cm[TRI_MAX_RECEIVERS][3];
+double *c[TRI_MAX_RECEIVERS];
 
-double cTm[3][WLS_MAX_RECEIVERS], cTxcm[2][2], cTxcInvm[2][2], cTxdRm[3][2];
+double cTm[3][TRI_MAX_RECEIVERS], cTxcm[2][2], cTxcInvm[2][2], cTxdRm[3][2];
 double *cT[3], *cTxc[3], *cTxcInv[3], *cTxdR[3];
 
 void MAIN__(void) {}
 
 /*************************************************************************
 
-  Name: wls
+  Name: trilaterate
   
   Purpose: The purpose of this program is to compute the position of
   an RF emitter, in 2 space, using the time difference of arrivial (TDOA)
   technique.  The position parameters have units of feet, and
   the time parameters have units of nanoseconds.
   
-  Calling Sequence: wls [-f] < inputFile
+  Calling Sequence: tri [-f] < inputFile
   
   Inputs:
     
@@ -58,7 +58,7 @@ void MAIN__(void) {}
 int main(int argc, char **argv)
 {
   char buffer[80];
-  struct vector3 v[WLS_MAX_RECEIVERS];  
+  struct vector3 v[TRI_MAX_RECEIVERS];  
   int i, n;
   double xe, ye;
   double x, y;
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
   } /* else */
   
   /* initialize the system */
-  wlsInit();  
+  triInit();  
 
   /* read number of receivers */  
   fgets(buffer,sizeof(buffer),stdin);
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
   ye /= n;
       
   /* determine location of emitter */
-  status = wlsComputePosition((n-1),xe,ye,v,&x,&y);
+  status = triComputePosition((n-1),xe,ye,v,&x,&y);
     
   switch (status)
   {
@@ -144,12 +144,12 @@ int main(int argc, char **argv)
 
 /*************************************************************************
 
-  Name: wlsInit
+  Name: triInit
   
   Purpose: The purpose of this function is to initialize all data
   structures.
   
-  Calling Sequence: wlsInit()
+  Calling Sequence: triInit()
   
   Inputs:
 
@@ -160,7 +160,7 @@ int main(int argc, char **argv)
       None.
   
 *************************************************************************/
-void wlsInit(void)
+void triInit(void)
 {
   int i;
 
@@ -169,7 +169,7 @@ void wlsInit(void)
     dXy[i] = dXym[i];
   } /* for */
   
-  for (i = 0; i < WLS_MAX_RECEIVERS; i++)
+  for (i = 0; i < TRI_MAX_RECEIVERS; i++)
   {
     dR[i] = dRm[i];
     c[i] = cm[i];
@@ -185,17 +185,17 @@ void wlsInit(void)
 
   return;
   
-} /* wlsInit */
+} /* triInit */
 
 /*************************************************************************
 
-  Name: wlsComputePosition
+  Name: triComputePosition
   
   Purpose: The purpose of this function is to compute the position of
   an emitter.  A least squares method is used so that RF multipath,
   timing jitter, and receiver position errors can be dealt with.
     
-  Calling Sequence: status = wlsComputePosition(m,xn,yn,v,x,y)
+  Calling Sequence: status = triComputePosition(m,xn,yn,v,x,y)
   
   Inputs:
 
@@ -224,7 +224,7 @@ void wlsInit(void)
         -2 - Failure do to too many iterations.
   
 *************************************************************************/
-int wlsComputePosition(int m,double xn,double yn,struct vector3 *v,
+int triComputePosition(int m,double xn,double yn,struct vector3 *v,
                        double *x,double *y)
 {
   int i, done, loopCount;
@@ -260,18 +260,18 @@ int wlsComputePosition(int m,double xn,double yn,struct vector3 *v,
     for (i = 0; i < m; i++)
     {
       /* compute differential direction cosine matrix */
-      wlsComputeDirection(xn,v[i].x,v[0].x,yn,
+      triComputeDirection(xn,v[i].x,v[0].x,yn,
                           v[i].y,v[0].y,&c[i][0],&c[i][1]);    
  
       /* compute nominal differential pseudo range */
-      rn0i[i] = wlsComputeNomRange(xn,v[i].x,v[0].x,yn,v[i].y,v[0].y); 
+      rn0i[i] = triComputeNomRange(xn,v[i].x,v[0].x,yn,v[i].y,v[0].y); 
 
       /* compute incremental differential pseudo range */
       dR[i][0] = r0i[i] - rn0i[i];
     } /* for */
    
     /* solve the least squares equation for dx and dy */
-    status = wlsComputeDeltaXy(m,c,dR,dXy);  
+    status = triComputeDeltaXy(m,c,dR,dXy);  
 
     /* a singular matrix will cause a status of zero */
     if (status == 0)
@@ -294,7 +294,7 @@ int wlsComputePosition(int m,double xn,double yn,struct vector3 *v,
     lamda = sqrt((dx * dx) + (dy * dy));    
 
     /* break out of loop when desired resolution is met */
-    if (lamda < WLS_LAMDA_TOLERANCE)
+    if (lamda < TRI_LAMDA_TOLERANCE)
     {
       /* set return values */
       *x = xn;
@@ -309,7 +309,7 @@ int wlsComputePosition(int m,double xn,double yn,struct vector3 *v,
     loopCount++;
     
     /* break out of loop if too many iterations have occurred */
-    if (loopCount >= WLS_MAX_ITERATIONS)
+    if (loopCount >= TRI_MAX_ITERATIONS)
     {
       /* indicate too many iterations */
       status = -2;      
@@ -324,16 +324,16 @@ int wlsComputePosition(int m,double xn,double yn,struct vector3 *v,
   
   return (status);
   
-} /* wlsComputePosition */
+} /* triComputePosition */
 
 /*************************************************************************
 
-  Name: wlsComputeNomRange
+  Name: triComputeNomRange
   
   Purpose: The purpose of this function is to compute the nominal
   differential pseudo range.
   
-  Calling Sequence: rn0i = wlsComputeNomRange(xn,xi,x0,yn,yi.y0)
+  Calling Sequence: rn0i = triComputeNomRange(xn,xi,x0,yn,yi.y0)
   
   Inputs:
 
@@ -354,7 +354,7 @@ int wlsComputePosition(int m,double xn,double yn,struct vector3 *v,
       rn0i - The nominal differential pseudo range.
   
 *************************************************************************/
-double wlsComputeNomRange(double xn,double xi,double x0,
+double triComputeNomRange(double xn,double xi,double x0,
                          double yn,double yi,double y0)
 {
   double xni, xn0;
@@ -379,17 +379,17 @@ double wlsComputeNomRange(double xn,double xi,double x0,
     
   return (rn0i);
   
-} /* wlsComputeNomRange */
+} /* triComputeNomRange */
 				  
 /*************************************************************************
 
-  Name: wlsComputeDirection
+  Name: triComputeDirection
   
   Purpose: The purpose of this function is to compute the differential
   cosine and differential sine associated with a particular receiver
   position with respect to the reference receiver and the emitter.
   
-  Calling Sequence: wlsComputeDirection(xn,xi,x0,yn,yi,y0,cx,cy)
+  Calling Sequence: triComputeDirection(xn,xi,x0,yn,yi,y0,cx,cy)
   
   Inputs:
 
@@ -415,7 +415,7 @@ double wlsComputeNomRange(double xn,double xi,double x0,
       None.
   
 *************************************************************************/
-void wlsComputeDirection(double xn,double xi,double x0,
+void triComputeDirection(double xn,double xi,double x0,
                          double yn,double yi,double y0,
 			 double *cx,double *cy)
 {
@@ -443,16 +443,16 @@ void wlsComputeDirection(double xn,double xi,double x0,
   
   return;
   
-} /* wlsComputeDirection */
+} /* triComputeDirection */
 
 /*************************************************************************
 
-  Name: wlsComputeDeltaXy
+  Name: triComputeDeltaXy
   
   Purpose: The purpose of this function is to compute the incremental
   position correction to a position estimate.
   
-  Calling Sequence: status = wlsComputeDeltaXy(m,c,dR,dXy)
+  Calling Sequence: status = triComputeDeltaXy(m,c,dR,dXy)
   
   Inputs:
 
@@ -472,7 +472,7 @@ void wlsComputeDirection(double xn,double xi,double x0,
         1 - Success.
   
 *************************************************************************/
-int wlsComputeDeltaXy(int m,double **c,double **dR,double **dXy)
+int triComputeDeltaXy(int m,double **c,double **dR,double **dXy)
 {
   int status;
   double buffer[4];
@@ -501,4 +501,4 @@ int wlsComputeDeltaXy(int m,double **c,double **dR,double **dXy)
   
   return (status);
 
-} /* wlsComputeDeltaXy */
+} /* triComputeDeltaXy */
