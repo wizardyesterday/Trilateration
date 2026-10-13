@@ -11,7 +11,7 @@ double *dXy[3], *dR[WLS_MAX_RECEIVERS];
 double cm[WLS_MAX_RECEIVERS][3];
 double *c[WLS_MAX_RECEIVERS];
 
-double cTm[3][WLS_MAX_RECEIVERS], cTxcm[3][3], cTxcInvm[3][3], cTxdRm[3][2];
+double cTm[3][WLS_MAX_RECEIVERS], cTxcm[2][2], cTxcInvm[2][2], cTxdRm[3][2];
 double *cT[3], *cTxc[3], *cTxcInv[3], *cTxdR[3];
 
 void MAIN__(void) {}
@@ -261,7 +261,7 @@ int wlsComputePosition(int m,double xn,double yn,struct vector3 *v,
     {
       /* compute differential direction cosine matrix */
       wlsComputeDirection(xn,v[i].x,v[0].x,yn,
-                          v[i].y,v[0].y,&c[i][1],&c[i][2]);    
+                          v[i].y,v[0].y,&c[i][0],&c[i][1]);    
  
       /* compute nominal differential pseudo range */
       rn0i[i] = wlsComputeNomRange(xn,v[i].x,v[0].x,yn,v[i].y,v[0].y); 
