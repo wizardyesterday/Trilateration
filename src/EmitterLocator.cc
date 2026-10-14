@@ -3,20 +3,6 @@
 #include "matutil.h"
 #include "EmitterLocator.h"
 
-int spaceIsInFeet;
-
-double dXym[3][2], dRm[TRI_MAX_RECEIVERS][2];
-double *dXy[3], *dR[TRI_MAX_RECEIVERS];
-
-double cm[TRI_MAX_RECEIVERS][3];
-double *c[TRI_MAX_RECEIVERS];
-
-double cTm[3][TRI_MAX_RECEIVERS], cTxcm[2][2], cTxcInvm[2][2], cTxdRm[3][2];
-double *cT[3], *cTxc[3], *cTxcInv[3], *cTxdR[3];
-
-void MAIN__(void) {}
-
-
 /*************************************************************************
 
   Name: Init
@@ -41,12 +27,12 @@ void Init(void)
 
   for (i = 0; i < 3; i++)
   {
-    dXy[i] = dXym[i];
+    DeltaXy[i] = DeltaXym[i];
   } /* for */
   
   for (i = 0; i < TRI_MAX_RECEIVERS; i++)
   {
-    dR[i] = dRm[i];
+    deltaR[i] = deltaRm[i];
     c[i] = cm[i];
   } /* for */
 
@@ -55,7 +41,7 @@ void Init(void)
     cT[i] = cTm[i];
     cTxc[i] = cTxcm[i];
     cTxcInv[i] = cTxcInvm[i];
-    cTxdR[i] = cTxdRm[i];    
+    cTxdeltaR[i] = cTxdeltaRm[i];    
   } /* for */
 
   return;
@@ -142,11 +128,11 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
       rn0i[i] = ComputeNominalRange(xn,v[i].x,v[0].x,yn,v[i].y,v[0].y); 
 
       /* compute incremental differential pseudo range */
-      dR[i][0] = r0i[i] - rn0i[i];
+      deltaR[i][0] = r0i[i] - rn0i[i];
     } /* for */
    
     /* solve the least squares equation for dx and dy */
-    status = ComputeDeltaXy(m,c,dR,dXy);  
+    status = ComputeDeltaXy(m,c,deltaR,DeltaXy);  
 
     /* a singular max will cause a status of zero */
     if (status == 0)
@@ -160,12 +146,12 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
     } /* if */
     
     /* compute new nominal position location */
-    xn += dXy[0][0];
-    yn += dXy[1][0];
+    xn += DeltaXy[0][0];
+    yn += DeltaXy[1][0];
 
     /* compute distance increment */
-    dx = dXy[0][0];
-    dy = dXy[1][0];
+    dx = DeltaXy[0][0];
+    dy = DeltaXy[1][0];
     lamda = sqrt((dx * dx) + (dy * dy));    
 
     /* break out of loop when desired resolution is met */
@@ -327,7 +313,7 @@ void EmitterLocator::computeDirection(double xn,double xi,double x0,
   Purpose: The purpose of this function is to compute the incremental
   position correction to a position estimate.
   
-  Calling Sequence: status = computeDeltaXy(m,c,dR,dXy)
+  Calling Sequence: status = computeDeltaXy(m,c,deltaR,DeltaXy)
   
   Inputs:
 
@@ -335,9 +321,9 @@ void EmitterLocator::computeDirection(double xn,double xi,double x0,
       
       c - An array of pointers to the rows of c[1..m][1..2].
       
-      dR - An array of pointers to the rows of dR[1..m][1..1].
+      deltaR - An array of pointers to the rows of deltaR[1..m][1..1].
       
-      dXy - An array of pointers to the rows of dXy[1..2][1..1].
+      DeltaXy - An array of pointers to the rows of DeltaXy[1..2][1..1].
      
       
   Outputs:
@@ -347,7 +333,7 @@ void EmitterLocator::computeDirection(double xn,double xi,double x0,
         1 - Success.
   
 *************************************************************************/
-int EmitterLocator::computeDeltaXy(int m,double **c,double **dR,double **dXy)
+int EmitterLocator::computeDeltaXy(int m,double **c,double **deltaR,double **DeltaXy)
 {
   int status;
   double buffer[4];
@@ -367,11 +353,11 @@ int EmitterLocator::computeDeltaXy(int m,double **c,double **dR,double **dXy)
   
   if (status == 1)
   {
-    /* compute cTxdR = [C'][dR] */
-    matMultiply(2,m,1,cT,dR,cTxdR);
+    /* compute cTxdeltaR = [C'][deltaR] */
+    matMultiply(2,m,1,cT,deltaR,cTxdeltaR);
   
-    /* compute [dXy] = Inv([C'][C])[C'][dR] */
-    matMultiply(2,2,1,cTxcInv,cTxdR,dXy);
+    /* compute [DeltaXy] = Inv([C'][C])[C'][deltaR] */
+    matMultiply(2,2,1,cTxcInv,cTxdeltaR,DeltaXy);
   } /* if */
   
   return (status);

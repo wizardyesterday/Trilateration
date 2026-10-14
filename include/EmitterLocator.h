@@ -52,7 +52,7 @@ class EmitterLocator
                         double yn,double yi,double y0,
                         double *cx,double *cy);
 			 
-  int computeDeltaXy(int m,double **c,double **dR,double **dXy);
+  int computeDeltaXy(int m,double **c,double **deltaR,double **deltaXy);
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -60,22 +60,22 @@ class EmitterLocator
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   int spaceIsInFeet;
 
-  double dXym[3][2];
-  dRm[TRI_MAX_RECEIVERS][2];
-  double *dXy[3];
-  double *dR[TRI_MAX_RECEIVERS];
+  double deltaXym[3][2];
+  deltaRm[MAX_RECEIVERS][2];
+  double *deltaXy[3];
+  double *deltaR[MAX_RECEIVERS];
 
-  double cm[TRI_MAX_RECEIVERS][3];
-  double *c[TRI_MAX_RECEIVERS];
+  double cm[MAX_RECEIVERS][3];
+  double *c[MAX_RECEIVERS];
 
-  double cTm[3][TRI_MAX_RECEIVERS];
+  double cTm[3][MAX_RECEIVERS];
   double cTxcm[2][2];
   double cTxcInvm[2][2];
-  doublecTxdRm[3][2];
+  doublecTxdeltaRm[3][2];
   double *cT[3];
   double *cTxc[3];
   double *cTxcInv[3];
-  double *cTxdR[3];
+  double *cTxdeltaR[3];
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 };
 
