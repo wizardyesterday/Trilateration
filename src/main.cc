@@ -69,6 +69,7 @@ int main(int argc, char **argv)
   double x, y;
   double distance, theta;
   int status;
+  EmitterLocator *locatorPtr;
   
   if (argc == 2)
   {
@@ -79,13 +80,13 @@ int main(int argc, char **argv)
     spaceIsInFeet = 0;
   } /* else */
   
-  /* initialize the system */
-  triInit();  
-
   /* read number of receivers */  
   fgets(buffer,sizeof(buffer),stdin);
   sscanf(buffer,"%d",&n);
   
+  // Instantiate an emitter locator instance.
+  locatorPtr = new EmitterLocator(n,spaceIsInFeet);
+
   /* zero initial estimate */
   xe = 0;
   ye = 0;
@@ -106,7 +107,7 @@ int main(int argc, char **argv)
   ye /= n;
       
   /* determine location of emitter */
-  status = computePosition((n-1),xe,ye,v,&x,&y);
+  status = locatorPtr->computePosition((n-1),xe,ye,v,&x,&y);
     
   switch (status)
   {
@@ -142,6 +143,9 @@ int main(int argc, char **argv)
       printf("status: %d\n",status);
       break;
   } /* case */
+
+  // Release resources.
+  delete locatorPtr;
 
   return (0);
   
