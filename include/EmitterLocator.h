@@ -2,10 +2,10 @@
  file name: EmitterLocator.h     
 *************************************************************************/
 
+#include <math.h>
+
 #ifndef __EMITTERLOCATOR_H__
 #define __EMITTERLOCATOR_H__
-
-
 
 /*************************************************************************
  defines    
@@ -33,7 +33,7 @@ struct vector3
 class EmitterLocator
 {
   public:
-  EmitterLocator(void);
+  EmitterLocator(int m,int spaceIsInFeet);
   ~EmitterLocator(void);
 
   int computePosition(int m,double xn,double yn,struct vector3 *v,
@@ -59,9 +59,10 @@ class EmitterLocator
   // Attributes.
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   int spaceIsInFeet;
+  int m;
 
   double deltaXym[3][2];
-  deltaRm[MAX_RECEIVERS][2];
+  double deltaRm[MAX_RECEIVERS][2];
   double *deltaXy[3];
   double *deltaR[MAX_RECEIVERS];
 
@@ -71,11 +72,14 @@ class EmitterLocator
   double cTm[3][MAX_RECEIVERS];
   double cTxcm[2][2];
   double cTxcInvm[2][2];
-  doublecTxdeltaRm[3][2];
+  double cTxdeltaRm[3][2];
   double *cT[3];
   double *cTxc[3];
   double *cTxcInv[3];
   double *cTxdeltaR[3];
+
+  double *r0i;
+  double *rn0i;
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 };
 

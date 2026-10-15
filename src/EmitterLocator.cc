@@ -5,12 +5,12 @@
 
 /*************************************************************************
 
-  Name: Init
+  Name: EmitterLocator
   
-  Purpose: The purpose of this function is to initialize all data
-  structures.
+  Purpose: The purpose of this function is to servd as a constructer
+  of an EmmiterLocator instance.
   
-  Calling Sequence: Init()
+  Calling Sequence: EmitterLocator()
   
   Inputs:
 
@@ -21,16 +21,16 @@
       None.
   
 *************************************************************************/
-void Init(void)
+EmitterLocator::EmitterLocator(int m, int spaceIsInFeet)
 {
   int i;
 
   for (i = 0; i < 3; i++)
   {
-    DeltaXy[i] = DeltaXym[i];
+    deltaXy[i] = deltaXym[i];
   } /* for */
   
-  for (i = 0; i < TRI_MAX_RECEIVERS; i++)
+  for (i = 0; i < MAX_RECEIVERS; i++)
   {
     deltaR[i] = deltaRm[i];
     c[i] = cm[i];
@@ -44,9 +44,52 @@ void Init(void)
     cTxdeltaR[i] = cTxdeltaRm[i];    
   } /* for */
 
+  /* allocate storage for the vectors */
+  r0i = new double[m];
+  rn0i = new double[m];
+  
   return;
   
-} /* Init */
+} // EmitterLocator
+
+/*************************************************************************
+
+  Name: ~EmitterLocator
+  
+  Purpose: The purpose of this function is to serve as a destructer
+  of an EmitterLocator instance.
+  
+  Calling Sequence: ~EmitterLocator()
+  
+  Inputs:
+
+      None.
+      
+  Outputs:
+  
+      None.
+  
+*************************************************************************/
+EmitterLocator::~EmitterLocator(void)
+{
+
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // free storage for the vectors.
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  if (r0i != NULL)
+  {
+    delete [] r0i;
+    r0i = NULL;
+  } // if
+
+  if (rn0i != NULL)
+  {
+    delete [] rn0i;
+    rn0i = NULL;
+  } // if
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+ 
+} // ~EmitterLocator
 
 /*************************************************************************
 
@@ -89,14 +132,9 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
                        double *x,double *y)
 {
   int i, done, loopCount;
-  double *r0i, *rn0i;
   double dx, dy, lamda;
   int status;
 
-  /* allocate storage for the vectors */
-  r0i = (double *)malloc((m + 1) * sizeof(double));
-  rn0i = (double *)malloc((m + 1) * sizeof(double));
-  
   /* used for while loop */
   done = 0;
   loopCount = 0;
@@ -121,18 +159,18 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
     for (i = 0; i < m; i++)
     {
       /* compute differential direction cosine max */
-      ComputeDirection(xn,v[i].x,v[0].x,yn,
+      computeDirection(xn,v[i].x,v[0].x,yn,
                           v[i].y,v[0].y,&c[i][0],&c[i][1]);    
  
       /* compute nominal differential pseudo range */
-      rn0i[i] = ComputeNominalRange(xn,v[i].x,v[0].x,yn,v[i].y,v[0].y); 
+      rn0i[i] = computeNominalRange(xn,v[i].x,v[0].x,yn,v[i].y,v[0].y); 
 
       /* compute incremental differential pseudo range */
       deltaR[i][0] = r0i[i] - rn0i[i];
     } /* for */
    
     /* solve the least squares equation for dx and dy */
-    status = ComputeDeltaXy(m,c,deltaR,DeltaXy);  
+    status = computeDeltaXy(m,c,deltaR,deltaXy);  
 
     /* a singular max will cause a status of zero */
     if (status == 0)
@@ -146,16 +184,16 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
     } /* if */
     
     /* compute new nominal position location */
-    xn += DeltaXy[0][0];
-    yn += DeltaXy[1][0];
+    xn += deltaXy[0][0];
+    yn += deltaXy[1][0];
 
     /* compute distance increment */
-    dx = DeltaXy[0][0];
-    dy = DeltaXy[1][0];
+    dx = deltaXy[0][0];
+    dy = deltaXy[1][0];
     lamda = sqrt((dx * dx) + (dy * dy));    
 
     /* break out of loop when desired resolution is met */
-    if (lamda < TRI_LAMDA_TOLERANCE)
+    if (lamda < LAMDA_TOLERANCE)
     {
       /* set return values */
       *x = xn;
@@ -170,7 +208,7 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
     loopCount++;
     
     /* break out of loop if too many iterations have occurred */
-    if (loopCount >= TRI_MAX_ITERATIONS)
+    if (loopCount >= MAX_ITERATIONS)
     {
       /* indicate too many iterations */
       status = -2;      
@@ -178,10 +216,6 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
       break;
     } /* if */ 
   } /* while */
-  
-  /* free storage for the vectors */
-  free(r0i);
-  free(rn0i);
   
   return (status);
   
@@ -215,8 +249,8 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
       rn0i - The nominal differential pseudo range.
   
 *************************************************************************/
-double EmitterLocator::computeNomRange(double xn,double xi,double x0,
-                         double yn,double yi,double y0)
+double EmitterLocator::computeNominalRange(double xn,double xi,double x0,
+                             double yn,double yi,double y0)
 {
   double xni, xn0;
   double yni, yn0;
@@ -241,7 +275,7 @@ double EmitterLocator::computeNomRange(double xn,double xi,double x0,
   return (rn0i);
   
 } /* computeNomRange */
-				  
+
 /*************************************************************************
 
   Name: computeDirection
