@@ -5,15 +5,6 @@
 
 int spaceIsInFeet;
 
-double dXym[3][2], dRm[MAX_RECEIVERS][2];
-double *dXy[3], *dR[MAX_RECEIVERS];
-
-double cm[MAX_RECEIVERS][3];
-double *c[MAX_RECEIVERS];
-
-double cTm[3][MAX_RECEIVERS], cTxcm[2][2], cTxcInvm[2][2], cTxdRm[3][2];
-double *cT[3], *cTxc[3], *cTxcInv[3], *cTxdR[3];
-
 extern "C"
 {
   extern void MAIN__(void);

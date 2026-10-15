@@ -21,20 +21,22 @@
       None.
   
 *************************************************************************/
-EmitterLocator::EmitterLocator(int m, int spaceIsInFeet)
+EmitterLocator::EmitterLocator(
+  int n,
+  int spaceIsInFeet)
 {
   int i;
 
   for (i = 0; i < 3; i++)
   {
     deltaXy[i] = deltaXym[i];
-  } /* for */
+  } // for
   
   for (i = 0; i < MAX_RECEIVERS; i++)
   {
     deltaR[i] = deltaRm[i];
     c[i] = cm[i];
-  } /* for */
+  } // for
 
   for (i = 0; i < 3; i++)
   {
@@ -42,11 +44,11 @@ EmitterLocator::EmitterLocator(int m, int spaceIsInFeet)
     cTxc[i] = cTxcm[i];
     cTxcInv[i] = cTxcInvm[i];
     cTxdeltaR[i] = cTxdeltaRm[i];    
-  } /* for */
+  } // for
 
-  /* allocate storage for the vectors */
-  r0i = new double[m];
-  rn0i = new double[m];
+  // Allocate storage for the vectors.
+  r0i = new double[n];
+  rn0i = new double[n];
   
   return;
   
@@ -74,7 +76,7 @@ EmitterLocator::~EmitterLocator(void)
 {
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // free storage for the vectors.
+  // Free storage for the vectors.
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   if (r0i != NULL)
   {
@@ -128,8 +130,13 @@ EmitterLocator::~EmitterLocator(void)
         -2 - Failure do to too many iterations.
   
 *************************************************************************/
-int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
-                       double *x,double *y)
+int EmitterLocator::computePosition(
+  int m,
+  double xn,
+  double yn,
+  struct vector3 *v,
+  double *x,
+  double *y)
 {
   int i, done, loopCount;
   double dx, dy, lamda;
@@ -139,87 +146,89 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
   done = 0;
   loopCount = 0;
   
-  /* compute r0i */
+  // Compute r0i.
   for (i = 0; i < m; i++)
   {
     if (spaceIsInFeet)
     {
-      /* convert to ft */
+      // Convert to feett.
       r0i[i] = (100000 * v[i].dt) / 101670;
-    } /* if */
+    } // if
     else
     {
-      /* convert to m */
+      // Convert to meters.
       r0i[i] = (100000 * v[i].dt) / 333564;
     } /* else */
-  } /* for */
+  } // for
   
   while (!done)
   {
     for (i = 0; i < m; i++)
     {
-      /* compute differential direction cosine max */
+      // Compute differential direction cosine max.
       computeDirection(xn,v[i].x,v[0].x,yn,
                           v[i].y,v[0].y,&c[i][0],&c[i][1]);    
  
-      /* compute nominal differential pseudo range */
+      // Compute nominal differential pseudo range.
       rn0i[i] = computeNominalRange(xn,v[i].x,v[0].x,yn,v[i].y,v[0].y); 
 
-      /* compute incremental differential pseudo range */
+      // Compute incremental differential pseudo range.
       deltaR[i][0] = r0i[i] - rn0i[i];
     } /* for */
    
-    /* solve the least squares equation for dx and dy */
+    // Solve the least squares equation for dx and dy.
     status = computeDeltaXy(m,c,deltaR,deltaXy);  
 
-    /* a singular max will cause a status of zero */
+    // A singular max will cause a status of zero.
     if (status == 0)
-    { /* set value and bail out */
+    {
+      // Set values, and bail out.
       *x = 0;
       *y = 0;
-      /* indicate singular max */
+      // Indicate singular max.
       status = -1;
-      /* bail out */
+      // Bail out.
       break;
-    } /* if */
+    } // if
     
-    /* compute new nominal position location */
+    // Compute new nominal position location.
     xn += deltaXy[0][0];
     yn += deltaXy[1][0];
 
-    /* compute distance increment */
+    // Compute distance increment.
     dx = deltaXy[0][0];
     dy = deltaXy[1][0];
     lamda = sqrt((dx * dx) + (dy * dy));    
 
-    /* break out of loop when desired resolution is met */
+    // Break out of loop when desired resolution is met.
     if (lamda < LAMDA_TOLERANCE)
     {
-      /* set return values */
+      // Set return values.
       *x = xn;
       *y = yn; 
-      /* indicate success */
+
+      // Indicate success.
       status = 0;     
-      /* bail out */
+      // Bail out.
       break;
-    } /* if */ 
+    } // if
      
-    /* indicate that one more iteration occurred */
+    // Indicate that one more iteration occurred.
     loopCount++;
     
-    /* break out of loop if too many iterations have occurred */
+    // break out of loop if too many iterations have occurred.
     if (loopCount >= MAX_ITERATIONS)
     {
-      /* indicate too many iterations */
+      // Indicate too many iterations.
       status = -2;      
-      /* bail out */
+      // Bail out.
       break;
-    } /* if */ 
-  } /* while */
+    } // if
+  } // while
   
   return (status);
   
-} /* computePosition */
+} // computePosition
 
 /*************************************************************************
 
@@ -249,32 +258,37 @@ int EmitterLocator::computePosition(int m,double xn,double yn,struct vector3 *v,
       rn0i - The nominal differential pseudo range.
   
 *************************************************************************/
-double EmitterLocator::computeNominalRange(double xn,double xi,double x0,
-                             double yn,double yi,double y0)
+double EmitterLocator::computeNominalRange(
+  double xn,
+  double xi,
+  double x0,
+  double yn,
+  double yi,
+  double y0)
 {
   double xni, xn0;
   double yni, yn0;
   double dni, dn0;
   double rn0i;
 
-  /* compute distance differences */  
+  // Compute distance differences.
   xni = xn - xi;
   xn0 = xn - x0;
   yni = yn - yi;
   yn0 = yn - y0;
   
-  /* compute distance from receiver i */
+  // Compute distance from receiver i.
   dni = sqrt((xni * xni) + (yni * yni));
   
-  /* compute distance from reference receiver */
+  // Compute distance from reference receiver.
   dn0 = sqrt((xn0 * xn0) + (yn0 * yn0));
   
-  /* compute pseudo range */
+  // Compute pseudo range.
   rn0i = dni - dn0;
     
   return (rn0i);
   
-} /* computeNomRange */
+} // computeNomRange
 
 /*************************************************************************
 
@@ -310,35 +324,41 @@ double EmitterLocator::computeNominalRange(double xn,double xi,double x0,
       None.
   
 *************************************************************************/
-void EmitterLocator::computeDirection(double xn,double xi,double x0,
-                         double yn,double yi,double y0,
-			 double *cx,double *cy)
+void EmitterLocator::computeDirection(
+  double xn,
+  double xi,
+  double x0,
+  double yn,
+  double yi,
+  double y0,
+  double *cx,
+  double *cy)
 {
   double xni, xn0;
   double yni, yn0;
   double dni, dn0;
 
-  /* compute distance differences */  
+  // Compute distance differences.
   xni = xn - xi;
   xn0 = xn - x0;
   yni = yn - yi;
   yn0 = yn - y0;
   
-  /* compute distance from receiver i */
+  // Compute distance from receiver i.
   dni = sqrt((xni * xni) + (yni * yni));
   
-  /* compute distance from reference receiver */
+  // Compute distance from reference receiver.
   dn0 = sqrt((xn0 * xn0) + (yn0 * yn0));
   
-  /* compute direction cosine */
+  // Compute direction cosine.
   *cx = (xni / dni) - (xn0 / dn0);
   
-  /* compute direction sine */
+  // Compute direction sine.
   *cy = (yni / dni) - (yn0 / dn0);
   
   return;
   
-} /* computeDirection */
+} // computeDirection
 
 /*************************************************************************
 
@@ -367,7 +387,11 @@ void EmitterLocator::computeDirection(double xn,double xi,double x0,
         1 - Success.
   
 *************************************************************************/
-int EmitterLocator::computeDeltaXy(int m,double **c,double **deltaR,double **DeltaXy)
+int EmitterLocator::computeDeltaXy(
+  int m,
+  double **c,
+  double **deltaR,
+  double **DeltaXy)
 {
   int status;
   double buffer[4];
@@ -379,21 +403,21 @@ int EmitterLocator::computeDeltaXy(int m,double **c,double **deltaR,double **Del
   /* compute [C'] */
   matTranspose(m,2,c,cT);
   
-  /* compute cTxc = [C'][C] */
+  // Compute cTxc = [C'][C].
   matMultiply(2,m,2,cT,c,cTxc);
   
-  /* compute cInv = Inv([C'][C]) */
+  // Compute cInv = Inv([C'][C]).
   status = matInverse(2,&aPtr,&bPtr,buffer);
   
   if (status == 1)
   {
-    /* compute cTxdeltaR = [C'][deltaR] */
+    // compute cTxdeltaR = [C'][deltaR].
     matMultiply(2,m,1,cT,deltaR,cTxdeltaR);
   
-    /* compute [DeltaXy] = Inv([C'][C])[C'][deltaR] */
+    // Compute [DeltaXy] = Inv([C'][C])[C'][deltaR].
     matMultiply(2,2,1,cTxcInv,cTxdeltaR,DeltaXy);
-  } /* if */
+  } // if
   
   return (status);
 
-} /* computeDeltaXy */
+} // computeDeltaXy

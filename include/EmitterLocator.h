@@ -33,7 +33,7 @@ struct vector3
 class EmitterLocator
 {
   public:
-  EmitterLocator(int m,int spaceIsInFeet);
+  EmitterLocator(int n,int spaceIsInFeet);
   ~EmitterLocator(void);
 
   int computePosition(int m,double xn,double yn,struct vector3 *v,
