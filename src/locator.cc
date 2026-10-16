@@ -14,14 +14,14 @@ void MAIN__(void) {}
 
 /*************************************************************************
 
-  Name: trilaterate
+  Name: locator
   
   Purpose: The purpose of this program is to compute the position of
   an RF emitter, in 2 space, using the time difference of arrivial (TDOA)
   technique.  The position parameters have units of feet, and
   the time parameters have units of nanoseconds.
   
-  Calling Sequence: tri [-f] < inputFile
+  Calling Sequence: locator [-f] < inputFile
   
   Inputs:
     
@@ -65,60 +65,60 @@ int main(int argc, char **argv)
   if (argc == 2)
   {
     spaceIsInFeet = 1;
-  } /* if */
+  } // if
   else
   {
     spaceIsInFeet = 0;
-  } /* else */
+  } // else
   
-  /* read number of receivers */  
+  // Read number of receivers.
   fgets(buffer,sizeof(buffer),stdin);
   sscanf(buffer,"%d",&n);
   
   // Instantiate an emitter locator instance.
   locatorPtr = new EmitterLocator(n,spaceIsInFeet);
 
-  /* zero initial estimate */
+  // Zero initial estimate.
   xe = 0;
   ye = 0;
       
-  /* read receiver locations and time differences */
+  // Read receiver locations and time differences.
   for (i = 0; i < n; i++)
   {
     fgets(buffer,sizeof(buffer),stdin);
     sscanf(buffer,"%lf %lf %lf\n",&v[i].x,&v[i].y,&v[i].dt);
 
-    /* accumulate for later averaging */
+    // Accumulate for later averaging.
     xe += v[i].x;
     ye += v[i].y;
-  } /* for */
+  } // for
       
   /* compute initial estimate */
   xe /= n;
   ye /= n;
       
-  /* determine location of emitter */
+  // Determine location of emitter.
   status = locatorPtr->computePosition((n-1),xe,ye,v,&x,&y);
     
   switch (status)
   {
     case 0:
-      /* output in cartesian coordinates */
+      // Output in cartesian coordinates.
       printf("\n[x y] = [%f %f]\n",x,y);
 
-      /* compute distance */
+      // Compute distance.
       distance = sqrt((x*x) + (y*y));
 
-      /* fix to avoid division by zero */
+      // Fix to avoid division by zero.
       if (x == 0)
       {
         x = 0.001;
-      } /* if */
+      } // if
     
-      /* compute bearing */
+      // Compute bearing.
       theta = atan(y / x) * 180 / M_PI;
     
-      /* output in polar coordinates */
+      // Output in polar coordinates.
       printf("[r theta] = [%f %f]\n",distance,theta);
       break;
 	
@@ -140,5 +140,5 @@ int main(int argc, char **argv)
 
   return (0);
   
-} /* main */
+} // main
 

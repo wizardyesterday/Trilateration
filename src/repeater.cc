@@ -10,8 +10,8 @@
   arrival (TDOA) information necessary for use of the wls program that
   is used for RF emitter location determination.  The position parameters
   have units of feet, and the time parameters have units of nanoseconds.
-  It should be noted that only the time difference information is modified.
-  All other parameters of the file are unchanged.
+  It should be noted that only the time difference information is
+  modified.  All other parameters of the file are unchanged.
   
   Calling Sequence: repeater [-a] [-f] < inputFile >outputFile
   
@@ -38,10 +38,11 @@
       of receivers, to the differences of time of arrival between the
       reference receiver, located at (x0,y0), and a receiver at location
       (xi,yi). Note that the receiver, located at (x0,y0) is designated
-      as the reference receiver for which all time differences are computed.
+      as the reference receiver for which all time differences are
+      computed.
       The tuple [xe ye] is the initial estimate of the position of the
       emitter.  The value n indicates the number of receivers that were
-      used for the collection of measurements      
+      used for the collection of measurements.
   
   Outputs:
   
@@ -85,7 +86,7 @@ int main(int argc, char **argv)
       break;
   } /* case */
   
-  /* read number of receivers, and echo the line */  
+  // Read number of receivers, and echo the line.
   fgets(buffer,sizeof(buffer),stdin);
   sscanf(buffer,"%d",&n);
   printf("%s",buffer);
@@ -93,43 +94,43 @@ int main(int argc, char **argv)
     
   for (i = 0; i < n; i++)
   {
-    /* get location and time difference of observer i */
+    // get location and time difference of observer i.
     fgets(buffer,sizeof(buffer),stdin);
     sscanf(buffer,"%lf %lf %lf\n",&x[i],&y[i],&dt);
       
-    /* compute difference vector */
+    // Compute difference vector.
     deltax = x[i] - x[0];
     deltay = y[i] - y[0];
   
-    /* compute distance */
+    // Compute distance.
     t = (deltax * deltax) + (deltay * deltay);
     t = sqrt(t);
 
-    /* convert to time */
-        if (spaceIsInFeet)
+    // Convert to time.
+    if (spaceIsInFeet)
     {
       t /= TDOA_FT_PER_NS;
-    } /* if */
+    } // if
     else
     {
       t /= TDOA_M_PER_NS;
-    } /* else */
+    } // else.
 
     if (addRepeaterPathDelay == 1)
     {
-      /* add repeater path delay for testing purposes */
+      // Add repeater path delay for testing purposes.
       dt += t;
-    } /* if */
+    } // if
     else
     {
-      /* subtract repeater path delay for testing purposes */
+      // Subtract repeater path delay for testing purposes.
       dt -= t;
-    } /* else */
+    } // else
             
-    /* output position and corrected time difference results */
+    // Output position and corrected time difference results.
     printf("%f %f %20.14f\n",x[i],y[i],dt);
-  } /* for */
+  } // for
 
   return (0);
 
-} /* main */
+} // main

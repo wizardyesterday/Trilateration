@@ -9,8 +9,8 @@
   Purpose: The purpose of this program is to generate time difference of
   arrival (TDOA) information and data necessary for testing of the wls
   program that is used for RF emitter location determination.  The
-  position parameters have units of feet or meters, and the time parameters
-  have units of nanoseconds.
+  position parameters have units of feet or meters, and the time
+  parameters have units of nanoseconds.
   
   Calling Sequence: wls < [-f] inputFile >outputFile
   
@@ -53,7 +53,7 @@
       (xi,yi). Note that the receiver, located at (x0,y0) is designated
       as the reference receiver for which all time differences are computed.
       The value n indicates the number of receivers that were used for the
-      collection of measurements      
+      collection of measurements.
 
 *************************************************************************/
 int main(int argc, char **argv)
@@ -73,34 +73,34 @@ int main(int argc, char **argv)
   else
   {
     spaceIsInFeet = 0;
-  } /* else */
+  } // else
   
-  /* read number of receivers */
+  // Read number of receivers.
   fgets(buffer,sizeof(buffer),stdin );
   sscanf(buffer,"%d",&n);
        
-  /* get position of source */
+  // Get position of source.
   fgets(buffer,sizeof(buffer),stdin);
   sscanf(buffer,"%lf %lf",&x,&y);
 
-  /* indicate number of receivers */
+  // indicate number of receivers.
   printf("%d\n",n);
   
   for (i = 0; i < n; i++)
   {
-    /* get location of observer i */
+    // Get location of observer i.
     fgets(buffer,sizeof(buffer),stdin);
     sscanf(buffer,"%lf %lf",&xo,&yo);
   
-    /* compute difference vector */
+    // compute difference vector.
     deltax = x - xo;
     deltay = y - yo;
   
-    /* compute distance */
+    // Compute distance.
     t[i] = (deltax * deltax) + (deltay * deltay);
     t[i] = sqrt(t[i]);
     
-    /* convert to time */
+    // Convert to time.
     if (spaceIsInFeet)
     {
       t[i] /= TDOA_FT_PER_NS;
@@ -108,14 +108,14 @@ int main(int argc, char **argv)
     else
     {
       t[i] /= TDOA_M_PER_NS;
-    } /* else */
+    } // else
             
-    /* output position and time difference results */
+    // Output position and time difference results.
     printf("%f %f %20.14f\n",xo,yo,(t[i]-t[0]));
 //    printf("%f %f %20.14f\n",xo,yo,t[i]);
-  } /* for */
+  } // for
 
   return (0);
 
-} /* main */
+} // main
 
