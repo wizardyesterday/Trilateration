@@ -159,13 +159,13 @@ int EmitterLocator::computePosition(
     if (spaceIsInFeet)
     {
       // Convert to feet.
-      r0i[i] = (100000 * v[i].dt) / 101670;
+      r0i[i] =  TDOA_FT_PER_NS * v[i].dt;
     } // if
     else
     {
       // Convert to meters.
-      r0i[i] = (100000 * v[i].dt) / 333564;
-    } /* else */
+      r0i[i] = TDOA_M_PER_NS * v[i].dt;
+    } // else
   } // for
   
   while (!done)
@@ -216,6 +216,7 @@ int EmitterLocator::computePosition(
 
       // Indicate success.
       status = 0;     
+
       // Bail out.
       break;
     } // if
@@ -223,7 +224,7 @@ int EmitterLocator::computePosition(
     // Indicate that one more iteration occurred.
     loopCount++;
     
-    // break out of loop if too many iterations have occurred.
+    // Break out of loop if too many iterations have occurred.
     if (loopCount >= MAX_ITERATIONS)
     {
       // Indicate too many iterations.
