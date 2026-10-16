@@ -151,7 +151,7 @@ int EmitterLocator::computePosition(
   {
     if (spaceIsInFeet)
     {
-      // Convert to feett.
+      // Convert to feet.
       r0i[i] = (100000 * v[i].dt) / 101670;
     } // if
     else

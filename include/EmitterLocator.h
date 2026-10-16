@@ -58,28 +58,84 @@ class EmitterLocator
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Attributes.
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  //-----------------------------------------------
+  // Configuration information.
+  //-----------------------------------------------
+  // meters - 0, feet -1
   int spaceIsInFeet;
-  int m;
+  //-----------------------------------------------
 
+  //-----------------------------------------------
+  // Distance corrections from  nominal values,
+  // x and y, in the linearized distance formula.
+  //-----------------------------------------------
+  // The matrix.
   double deltaXym[3][2];
-  double deltaRm[MAX_RECEIVERS][2];
+
+  // The pointer to the matrix.
   double *deltaXy[3];
+  //-----------------------------------------------
+
+  //-----------------------------------------------
+  // Information for difference in differential
+  // pseudorange.
+  //-----------------------------------------------
+  // The matrix.
+  double deltaRm[MAX_RECEIVERS][2];
+
+  // The pointer to the matrix.
   double *deltaR[MAX_RECEIVERS];
+  //-----------------------------------------------
 
-  double cm[MAX_RECEIVERS][3];
+  //-----------------------------------------------
+  // Differential direction cosine information. 
+  //-----------------------------------------------
+  // The matrix.
+  double cm[MAX_RECEIVERS][2];
+
+  // The pointer to the matrix.
   double *c[MAX_RECEIVERS];
+  //-----------------------------------------------
 
+  //-----------------------------------------------
+  // [C]' information.
+  //-----------------------------------------------
+  // The matrix.
   double cTm[3][MAX_RECEIVERS];
-  double cTxcm[2][2];
-  double cTxcInvm[2][2];
-  double cTxdeltaRm[3][2];
+
+  // The pointer to the matrix.
   double *cT[3];
-  double *cTxc[3];
-  double *cTxcInv[3];
+  //-----------------------------------------------
+
+  //-----------------------------------------------
+  // [C]'[C] information.
+  //-----------------------------------------------
+  // The matrix.
+  double cTxcm[2][2];
+
+  // The pointer to the matrix.
+  double *cTxc[2];
+  //-----------------------------------------------
+
+  //-----------------------------------------------
+  // Inverse([C]'[C]) information.
+  //-----------------------------------------------
+  // The matrix.
+  double cTxcInvm[2][2];
+
+  // The pointer to the matrix.
+  double *cTxcInv[2];
+  //-----------------------------------------------
+
+  double cTxdeltaRm[3][2];
   double *cTxdeltaR[3];
 
+  //-----------------------------------------------
+  // Pseudorange information.
+  //-----------------------------------------------
   double *r0i;
   double *rn0i;
+  //-----------------------------------------------
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 };
 
