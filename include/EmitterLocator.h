@@ -13,8 +13,6 @@
 #define MAX_RECEIVERS   (50)
 #define LAMDA_TOLERANCE (0.1)
 #define MAX_ITERATIONS  (100)
-
-#define TDOA_FT_PER_NS      (0.98357105643L)
 #define TDOA_M_PER_NS       (0.299792458L)
 
 /*************************************************************************
@@ -33,7 +31,7 @@ struct vector3
 class EmitterLocator
 {
   public:
-  EmitterLocator(int n,int spaceIsInFeet);
+  EmitterLocator(int n);
   ~EmitterLocator(void);
 
   int computePosition(int m,double xn,double yn,struct vector3 *v,

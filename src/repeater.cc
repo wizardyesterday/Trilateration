@@ -13,7 +13,7 @@
   It should be noted that only the time difference information is
   modified.  All other parameters of the file are unchanged.
   
-  Calling Sequence: repeater [-a] [-f] < inputFile >outputFile
+  Calling Sequence: repeater [-a] < inputFile > outputFile
   
   Inputs:
   
@@ -21,9 +21,6 @@
     to the time differences.  If this flag is not specified, repeater
     path delay will be subtracted from the time differences.
     
-    An optional flag (the -f) which indicates that position parameters are
-    in feet, otherwise, they are in units of meters.
-       
     A text file with the following format:
       n
       xe ye 
@@ -58,31 +55,22 @@ int main(int argc, char **argv)
   double deltax, deltay;
   double t;
   int addRepeaterPathDelay;
-  int spaceIsInFeet;
 
   switch (argc)
   {
-    case 3:
-      addRepeaterPathDelay = 1;
-      spaceIsInFeet = 1;
-      break;
-    
     case 2:
       if (argv[1][1] == 'd')
       {
         addRepeaterPathDelay = 1;
-	spaceIsInFeet = 0;
       } /* if */
       else
       {
         addRepeaterPathDelay = 0;
-        spaceIsInFeet = 1;
       } /* else */
       break;
       
     default:
       addRepeaterPathDelay = 0;
-      spaceIsInFeet = 0;
       break;
   } /* case */
   
@@ -106,15 +94,8 @@ int main(int argc, char **argv)
     t = (deltax * deltax) + (deltay * deltay);
     t = sqrt(t);
 
-    // Convert to time.
-    if (spaceIsInFeet)
-    {
-      t /= TDOA_FT_PER_NS;
-    } // if
-    else
-    {
-      t /= TDOA_M_PER_NS;
-    } // else.
+    // Convert meters to nanoseconds.
+    t /= TDOA_M_PER_NS;
 
     if (addRepeaterPathDelay == 1)
     {

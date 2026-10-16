@@ -76,7 +76,7 @@ int main(int argc, char **argv)
   sscanf(buffer,"%d",&n);
   
   // Instantiate an emitter locator instance.
-  locatorPtr = new EmitterLocator(n,spaceIsInFeet);
+  locatorPtr = new EmitterLocator(n);
 
   // Zero initial estimate.
   xe = 0;

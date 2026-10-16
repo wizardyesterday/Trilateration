@@ -12,13 +12,10 @@
   position parameters have units of feet or meters, and the time
   parameters have units of nanoseconds.
   
-  Calling Sequence: wls < [-f] inputFile >outputFile
+  Calling Sequence: wls < inputFile >outputFile
   
   Inputs:
 
-    An optional flag (the -f) which indicates that position parameters are
-    in feet, otherwise, they are in units of meters.
-       
     A text file with the following format:
       n
       x y 
@@ -66,15 +63,6 @@ int main(int argc, char **argv)
   double t[50];
   int spaceIsInFeet;
 
-  if (argc == 2)
-  {
-    spaceIsInFeet = 1;
-  } /* if */
-  else
-  {
-    spaceIsInFeet = 0;
-  } // else
-  
   // Read number of receivers.
   fgets(buffer,sizeof(buffer),stdin );
   sscanf(buffer,"%d",&n);
@@ -100,15 +88,8 @@ int main(int argc, char **argv)
     t[i] = (deltax * deltax) + (deltay * deltay);
     t[i] = sqrt(t[i]);
     
-    // Convert to time.
-    if (spaceIsInFeet)
-    {
-      t[i] /= TDOA_FT_PER_NS;
-    } /* if */
-    else
-    {
-      t[i] /= TDOA_M_PER_NS;
-    } // else
+    // Convert meters to nanoseconds.
+    t[i] /= TDOA_M_PER_NS;
             
     // Output position and time difference results.
     printf("%f %f %20.14f\n",xo,yo,(t[i]-t[0]));

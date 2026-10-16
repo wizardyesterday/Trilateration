@@ -10,29 +10,20 @@
   Purpose: The purpose of this function is to servd as a constructer
   of an EmmiterLocator instance.
   
-  Calling Sequence: EmitterLocator(n,dpaceIsInFeet)
+  Calling Sequence: EmitterLocator(n,)
   
   Inputs:
 
       n - The number of radio observers.
 
-      spaceIsInFeet - A flag that, when set to 1 indicates that
-      position is measured in feet, otherwise, position is measured
-      in meters.
-      
   Outputs:
   
       None.
   
 *************************************************************************/
-EmitterLocator::EmitterLocator(
-  int n,
-  int spaceIsInFeet)
+EmitterLocator::EmitterLocator(int n)
 {
   int i;
-
-  // Store for later.
-  this->spaceIsInFeet = spaceIsInFeet;
 
   for (i = 0; i < 3; i++)
   {
@@ -156,16 +147,8 @@ int EmitterLocator::computePosition(
   // Compute r0i.
   for (i = 0; i < m; i++)
   {
-    if (spaceIsInFeet)
-    {
-      // Convert to feet.
-      r0i[i] =  TDOA_FT_PER_NS * v[i].dt;
-    } // if
-    else
-    {
-      // Convert to meters.
-      r0i[i] = TDOA_M_PER_NS * v[i].dt;
-    } // else
+    // Convert to meters.
+    r0i[i] = TDOA_M_PER_NS * v[i].dt;
   } // for
   
   while (!done)
