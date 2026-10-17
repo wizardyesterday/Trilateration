@@ -9,7 +9,7 @@
   Purpose: The purpose of this program is to modify time difference of
   arrival (TDOA) information necessary for use of the wls program that
   is used for RF emitter location determination.  The position parameters
-  have units of feet, and the time parameters have units of nanoseconds.
+  have units of meters, and the time parameters have units of nanoseconds.
   It should be noted that only the time difference information is
   modified.  All other parameters of the file are unchanged.
   
