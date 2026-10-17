@@ -25,6 +25,12 @@ EmitterLocator::EmitterLocator(int n)
 {
   int i;
 
+  if (n > MAX_RECEIVERS)
+  {
+    // Clip it.
+    n = MAX_RECEIVERS;
+  } // if
+
   for (i = 0; i < 3; i++)
   {
     deltaXy[i] = deltaXym[i];
@@ -139,6 +145,12 @@ int EmitterLocator::computePosition(
   int i, done, loopCount;
   double dx, dy, lamda;
   int status;
+
+  if (m > (MAX_RECEIVERS-1))
+  {
+    // Clip it.
+    m = MAX_RECEIVERS - 1;
+  } // if
 
   /* used for while loop */
   done = 0;
